@@ -92,6 +92,13 @@
       transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
     }
 
+    /* Na mobilech zhruba 3 řady na výšku */
+    @media (max-width: 700px) {
+      .counter-card {
+        min-height: 30vh;
+      }
+    }
+
     .counter-card:active {
       transform: translateY(1px);
       box-shadow: 0 1px 4px rgba(0,0,0,0.12);
@@ -129,25 +136,6 @@
       box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgba(0,0,0,0.08);
     }
 
-    .menu-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      flex-shrink: 0;
-      background: #f3f4f6;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      margin-left: 0.2rem;
-    }
-
-    .menu-btn:active {
-      transform: scale(0.95);
-    }
-
     .header-right {
       display: flex;
       align-items: center;
@@ -163,6 +151,7 @@
       align-items: stretch;
       justify-content: center;
       margin-top: 0.15rem;
+      flex: 1;
     }
 
     .counter-value {
@@ -177,13 +166,14 @@
       grid-template-columns: 1fr 1fr;
       gap: 0.35rem;
       width: 100%;
+      margin-top: auto;
     }
 
     .counter-buttons-main .btn {
       border-radius: 0.9rem;
-      padding-block: 0.9rem;
-      font-size: 1.5rem;
-      min-height: 64px;
+      padding-block: 1.1rem;
+      font-size: 1.8rem;
+      min-height: 80px;
     }
 
     .footer {
@@ -193,13 +183,14 @@
       color: #888;
     }
 
-    /* Overlay menu pro Reset / Smazat */
+    /* ---------- Fullscreen detail ---------- */
+
     .overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.4);
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
       z-index: 999;
     }
@@ -208,34 +199,130 @@
       display: none;
     }
 
-    .menu-dialog {
+    .detail-view {
       background: #fff;
-      border-radius: 1rem;
-      padding: 1rem;
-      width: 90%;
-      max-width: 360px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    }
-
-    .menu-dialog-title {
-      font-weight: 600;
-      margin-bottom: 0.6rem;
-      font-size: 1rem;
-    }
-
-    .menu-dialog-buttons {
+      width: 100%;
+      max-width: 900px;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
-      margin-top: 0.6rem;
+      height: 100%;
     }
 
-    .menu-dialog-buttons .btn {
-      width: 100%;
+    .detail-header {
+      display: flex;
+      align-items: center;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid #e5e7eb;
+      gap: 0.4rem;
+    }
+
+    .detail-back-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: none;
+      background: #f3f4f6;
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      padding-block: 0.6rem;
-      font-size: 0.95rem;
-      border-radius: 0.7rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .detail-title-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .detail-name {
+      width: 100%;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      background: transparent;
+      padding: 0.2rem 0.3rem;
+      border-radius: 0.4rem;
+    }
+
+    .detail-name:focus {
+      outline: 1px solid #3b82f6;
+      background: #eff6ff;
+    }
+
+    .detail-header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: none;
+      background: #f3f4f6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    .detail-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0.8rem;
+      gap: 0.8rem;
+    }
+
+    .detail-color-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+    }
+
+    .detail-color-swatch {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgba(0,0,0,0.15);
+    }
+
+    .detail-color-swatch.selected {
+      box-shadow: 0 0 0 2px #fff, 0 0 0 3px #111;
+    }
+
+    .detail-value {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      font-weight: 700;
+    }
+
+    .detail-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .detail-buttons .btn {
+      border-radius: 1rem;
+      padding-block: 1.5rem;
+      font-size: 2.4rem;
+      min-height: 96px;
     }
   </style>
 </head>
@@ -253,20 +340,32 @@
     Hodnoty se ukládají jen do tohoto zařízení (localStorage).
   </div>
 
-  <!-- Menu overlay pro Reset / Smazat -->
-  <div id="menuOverlay" class="overlay hidden">
-    <div class="menu-dialog">
-      <div class="menu-dialog-title" id="menuTitle">Nastavení počítadla</div>
-      <div class="menu-dialog-buttons">
-        <button class="btn btn-secondary" id="menuResetBtn">Resetovat na 0</button>
-        <button class="btn btn-danger" id="menuDeleteBtn">Smazat počítadlo</button>
-        <button class="btn btn-secondary" id="menuCancelBtn">Zrušit</button>
+  <!-- Fullscreen detail -->
+  <div id="detailOverlay" class="overlay hidden">
+    <div class="detail-view">
+      <div class="detail-header">
+        <button id="detailBackBtn" class="detail-back-btn">←</button>
+        <div class="detail-title-wrapper">
+          <input id="detailName" class="detail-name" />
+        </div>
+        <div class="detail-header-right">
+          <button id="detailResetBtn" class="icon-btn" title="Resetovat">↺</button>
+          <button id="detailDeleteBtn" class="icon-btn" title="Smazat">🗑</button>
+        </div>
+      </div>
+      <div class="detail-body">
+        <div id="detailColorRow" class="detail-color-row"></div>
+        <div id="detailValue" class="detail-value">0</div>
+        <div class="detail-buttons">
+          <button id="detailMinusBtn" class="btn btn-secondary">−</button>
+          <button id="detailPlusBtn" class="btn btn-primary">+</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "my_counter_app_v2";
+    const STORAGE_KEY = "my_counter_app_v3";
 
     const COLORS = [
       "#f97316", // oranžová
@@ -274,7 +373,10 @@
       "#2563eb", // modrá
       "#ec4899", // růžová
       "#10b981", // zelená
-      "#7c3aed"  // fialová
+      "#7c3aed", // fialová
+      "#22c55e", // světle zelená
+      "#eab308", // žlutá
+      "#0ea5e9"  // světle modrá
     ];
 
     // Zvuk "kliknutí" – krátký šum
@@ -333,7 +435,7 @@
     }
 
     let counters = loadCounters();
-    let activeMenuCounterId = null;
+    let activeDetailId = null;
 
     function renderCounters() {
       const container = document.getElementById("counters");
@@ -379,18 +481,7 @@
           cycleColor(counter.id);
         });
 
-        const menuBtn = document.createElement("button");
-        menuBtn.className = "menu-btn";
-        menuBtn.innerHTML = "⋮";
-        menuBtn.title = "Menu";
-        menuBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          openMenu(counter.id);
-        });
-
         headerRight.appendChild(colorBtn);
-        headerRight.appendChild(menuBtn);
-
         header.appendChild(nameInput);
         header.appendChild(headerRight);
 
@@ -407,7 +498,7 @@
 
         const minusBtn = document.createElement("button");
         minusBtn.className = "btn btn-secondary";
-        minusBtn.textContent = "–";
+        minusBtn.textContent = "−";
         minusBtn.addEventListener("click", () => changeValue(counter.id, -1));
 
         const plusBtn = document.createElement("button");
@@ -424,8 +515,10 @@
 
         card.appendChild(header);
         card.appendChild(valueWrapper);
-
         container.appendChild(card);
+
+        // Long press → otevřít detail, ale ne na tlačítkách nebo v inputu
+        attachLongPress(card, () => openDetail(counter.id));
       });
     }
 
@@ -435,6 +528,7 @@
       );
       saveCounters(counters);
       renderCounters();
+      updateDetailIfActive(id);
       playClickSound();
     }
 
@@ -444,6 +538,7 @@
       );
       saveCounters(counters);
       renderCounters();
+      updateDetailIfActive(id);
       playClickSound();
     }
 
@@ -451,6 +546,9 @@
       counters = counters.filter(c => c.id !== id);
       saveCounters(counters);
       renderCounters();
+      if (activeDetailId === id) {
+        closeDetail();
+      }
     }
 
     function updateCounterName(id, newName) {
@@ -459,6 +557,7 @@
       );
       saveCounters(counters);
       renderCounters();
+      updateDetailIfActive(id);
     }
 
     function cycleColor(id) {
@@ -472,6 +571,17 @@
       });
       saveCounters(counters);
       renderCounters();
+      updateDetailIfActive(id);
+      playClickSound();
+    }
+
+    function setColor(id, color) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, color } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
       playClickSound();
     }
 
@@ -491,19 +601,86 @@
       playClickSound();
     }
 
-    function openMenu(id) {
-      activeMenuCounterId = id;
-      const overlay = document.getElementById("menuOverlay");
-      const title = document.getElementById("menuTitle");
-      const counter = counters.find(c => c.id === id);
-      title.textContent = counter ? `Nastavení: ${counter.name}` : "Nastavení počítadla";
-      overlay.classList.remove("hidden");
+    // ---------- Long press helper ----------
+    function attachLongPress(element, callback) {
+      let timer = null;
+
+      const start = (e) => {
+        // neotevírat detail, když klikáme na tlačítko nebo input
+        if (e.target.closest("button") || e.target.closest("input")) return;
+        timer = setTimeout(() => {
+          timer = null;
+          callback();
+        }, 500);
+      };
+
+      const cancel = () => {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      };
+
+      element.addEventListener("pointerdown", start);
+      element.addEventListener("pointerup", cancel);
+      element.addEventListener("pointerleave", cancel);
+      element.addEventListener("pointercancel", cancel);
     }
 
-    function closeMenu() {
-      const overlay = document.getElementById("menuOverlay");
+    // ---------- Detail view ----------
+
+    function openDetail(id) {
+      activeDetailId = id;
+      const overlay = document.getElementById("detailOverlay");
+      overlay.classList.remove("hidden");
+      renderDetail();
+    }
+
+    function closeDetail() {
+      const overlay = document.getElementById("detailOverlay");
       overlay.classList.add("hidden");
-      activeMenuCounterId = null;
+      activeDetailId = null;
+    }
+
+    function updateDetailIfActive(id) {
+      if (activeDetailId === id) {
+        renderDetail();
+      }
+    }
+
+    function renderDetail() {
+      if (!activeDetailId) return;
+      const counter = counters.find(c => c.id === activeDetailId);
+      if (!counter) return;
+
+      const color = counter.color || COLORS[0];
+
+      const nameInput = document.getElementById("detailName");
+      const valueEl = document.getElementById("detailValue");
+      const minusBtn = document.getElementById("detailMinusBtn");
+      const plusBtn = document.getElementById("detailPlusBtn");
+      const colorRow = document.getElementById("detailColorRow");
+
+      nameInput.value = counter.name || "Bez názvu";
+      nameInput.style.color = "#111";
+      valueEl.textContent = counter.value;
+      valueEl.style.color = color;
+      plusBtn.style.background = color;
+
+      // Paleta barev
+      colorRow.innerHTML = "";
+      COLORS.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = "detail-color-swatch";
+        if (c === color) btn.classList.add("selected");
+        btn.style.background = c;
+        btn.addEventListener("click", () => setColor(counter.id, c));
+        colorRow.appendChild(btn);
+      });
+
+      // Připojení handlerů (jednou)
+      minusBtn.onclick = () => changeValue(counter.id, -1);
+      plusBtn.onclick = () => changeValue(counter.id, 1);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -523,37 +700,38 @@
         }
       });
 
-      const overlay = document.getElementById("menuOverlay");
-      const resetBtn = document.getElementById("menuResetBtn");
-      const deleteBtn = document.getElementById("menuDeleteBtn");
-      const cancelBtn = document.getElementById("menuCancelBtn");
+      // Detail header
+      const backBtn = document.getElementById("detailBackBtn");
+      const resetBtn = document.getElementById("detailResetBtn");
+      const deleteBtn = document.getElementById("detailDeleteBtn");
+      const detailNameInput = document.getElementById("detailName");
 
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) {
-          closeMenu();
-        }
+      backBtn.addEventListener("click", () => {
+        closeDetail();
       });
 
       resetBtn.addEventListener("click", () => {
-        if (activeMenuCounterId) {
-          resetCounter(activeMenuCounterId);
+        if (!activeDetailId) return;
+        const c = counters.find(c => c.id === activeDetailId);
+        const name = c ? c.name : "počítadlo";
+        if (confirm(`Resetovat "${name}" na 0?`)) {
+          resetCounter(activeDetailId);
         }
-        closeMenu();
       });
 
       deleteBtn.addEventListener("click", () => {
-        if (activeMenuCounterId) {
-          const c = counters.find(c => c.id === activeMenuCounterId);
-          const name = c ? c.name : "počítadlo";
-          if (confirm(`Opravdu smazat "${name}"?`)) {
-            deleteCounter(activeMenuCounterId);
-          }
+        if (!activeDetailId) return;
+        const c = counters.find(c => c.id === activeDetailId);
+        const name = c ? c.name : "počítadlo";
+        if (confirm(`Opravdu smazat "${name}"?`)) {
+          deleteCounter(activeDetailId);
         }
-        closeMenu();
       });
 
-      cancelBtn.addEventListener("click", () => {
-        closeMenu();
+      detailNameInput.addEventListener("change", () => {
+        if (!activeDetailId) return;
+        const newName = detailNameInput.value.trim() || "Bez názvu";
+        updateCounterName(activeDetailId, newName);
       });
 
       renderCounters();
