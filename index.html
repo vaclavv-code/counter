@@ -82,7 +82,7 @@
     }
 
     .counter-card {
-      background: #111827; /* přepsáno inline barvou counteru */
+      background: #111827; /* barva se přepíše inline */
       border-radius: 1.1rem;
       box-shadow: 0 2px 12px rgba(0,0,0,0.45);
       padding: 0.7rem 0.7rem 0.75rem 0.7rem;
@@ -145,7 +145,7 @@
     .counter-buttons-main .btn {
       border-radius: 0.9rem;
       padding-block: 1.1rem;
-      font-size: 2.4rem;   /* větší + / - */
+      font-size: 2.4rem;
       font-weight: 800;
       min-height: 80px;
     }
@@ -156,8 +156,6 @@
       text-align: center;
       color: #6b7280;
     }
-
-    /* ---------- Fullscreen detail (dark) ---------- */
 
     .overlay {
       position: fixed;
@@ -201,7 +199,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.9rem; /* větší ikonka */
+      font-size: 1.9rem;
       cursor: pointer;
       flex-shrink: 0;
       color: #e5e7eb;
@@ -245,7 +243,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.9rem;  /* větší ikonky */
+      font-size: 1.9rem;
       color: #e5e7eb;
     }
 
@@ -302,7 +300,7 @@
     .detail-buttons .btn {
       border-radius: 1.1rem;
       padding-block: 1.5rem;
-      font-size: 3rem;   /* větší + / - ve fullscreen */
+      font-size: 3rem;
       font-weight: 800;
       min-height: 96px;
     }
@@ -320,7 +318,6 @@
     Hodnoty se ukládají jen do tohoto zařízení (localStorage).
   </div>
 
-  <!-- Fullscreen detail -->
   <div id="detailOverlay" class="overlay hidden">
     <div class="detail-view">
       <div class="detail-header">
@@ -348,19 +345,21 @@
     const STORAGE_KEY = "my_counter_app_v3";
 
     const COLORS = [
-      "#f97316", // oranžová
-      "#808000", // olivová
-      "#2563eb", // modrá
-      "#ec4899", // růžová
-      "#10b981", // zelená
-      "#7c3aed", // fialová
-      "#22c55e", // světle zelená
-      "#eab308", // žlutá
-      "#0ea5e9"  // světle modrá
+      "#f97316",
+      "#6b7280",
+      "#2563eb",
+      "#ec4899",
+      "#10b981",
+      "#7c3aed",
+      "#22c55e",
+      "#eab308",
+      "#0ea5e9"
     ];
 
-    // Zvuk "kliknutí" – krátký šum
+    let counters = loadCounters();
+    let activeDetailId = null;
     let audioContext = null;
+
     function playClickSound() {
       try {
         const AC = window.AudioContext || window.webkitAudioContext;
@@ -406,16 +405,25 @@
       }
     }
 
-    function saveCounters(counters) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(counters));
+    function saveCounters(nextCounters) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextCounters));
     }
 
     function createId() {
       return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7);
     }
 
-    let counters = loadCounters();
-    let activeDetailId = null;
+    function updateCounters(updater, options = { playSound: true }) {
+      counters = updater(counters);
+      saveCounters(counters);
+      renderCounters();
+      if (activeDetailId) {
+        renderDetail();
+      }
+      if (options.playSound) {
+        playClickSound();
+      }
+    }
 
     function renderCounters() {
       const container = document.getElementById("counters");
@@ -438,7 +446,7 @@
         card.className = "counter-card";
         card.dataset.id = counter.id;
         card.style.borderColor = color;
-        card.style.background = color; // dlaždice v barvě counteru
+        card.style.background = color;
 
         const header = document.createElement("div");
         header.className = "counter-header";
@@ -481,78 +489,67 @@
         card.appendChild(valueWrapper);
         container.appendChild(card);
 
-        // Long press → otevřít detail, ale ne na tlačítkách
         attachLongPress(card, () => openDetail(counter.id));
       });
     }
 
     function changeValue(id, delta) {
-      counters = counters.map(c =>
-        c.id === id ? { ...c, value: c.value + delta } : c
+      updateCounters(cs =>
+        cs.map(c =>
+          c.id === id ? { ...c, value: c.value + delta } : c
+        )
       );
-      saveCounters(counters);
-      renderCounters();
-      updateDetailIfActive(id);
-      playClickSound();
     }
 
     function resetCounter(id) {
-      counters = counters.map(c =>
-        c.id === id ? { ...c, value: 0 } : c
+      updateCounters(cs =>
+        cs.map(c =>
+          c.id === id ? { ...c, value: 0 } : c
+        )
       );
-      saveCounters(counters);
-      renderCounters();
-      updateDetailIfActive(id);
-      playClickSound();
     }
 
     function deleteCounter(id) {
-      counters = counters.filter(c => c.id !== id);
-      saveCounters(counters);
-      renderCounters();
+      updateCounters(cs => cs.filter(c => c.id !== id));
       if (activeDetailId === id) {
         closeDetail();
       }
     }
 
     function updateCounterName(id, newName) {
-      counters = counters.map(c =>
-        c.id === id ? { ...c, name: newName } : c
+      const safeName = newName.trim() || "Bez názvu";
+      updateCounters(cs =>
+        cs.map(c =>
+          c.id === id ? { ...c, name: safeName } : c
+        ),
+        { playSound: false }
       );
-      saveCounters(counters);
-      renderCounters();
-      updateDetailIfActive(id);
     }
 
     function setColor(id, color) {
-      counters = counters.map(c =>
-        c.id === id ? { ...c, color } : c
+      updateCounters(cs =>
+        cs.map(c =>
+          c.id === id ? { ...c, color } : c
+        )
       );
-      saveCounters(counters);
-      renderCounters();
-      updateDetailIfActive(id);
-      playClickSound();
     }
 
     function addCounter(name) {
       const trimmed = name.trim();
-      const idx = counters.length % COLORS.length;
-      const color = COLORS[idx];
-
-      counters.push({
-        id: createId(),
-        name: trimmed || `Počítadlo ${counters.length + 1}`,
-        value: 0,
-        color
+      updateCounters(cs => {
+        const idx = cs.length % COLORS.length;
+        const color = COLORS[idx];
+        return cs.concat({
+          id: createId(),
+          name: trimmed || `Počítadlo ${cs.length + 1}`,
+          value: 0,
+          color
+        });
       });
-      saveCounters(counters);
-      renderCounters();
-      playClickSound();
       const input = document.getElementById("newCounterName");
       input.value = "";
     }
 
-    // ---------- Long press helper ----------
     function attachLongPress(element, callback) {
       let timer = null;
 
@@ -577,25 +574,15 @@
       element.addEventListener("pointercancel", cancel);
     }
 
-    // ---------- Detail view ----------
-
     function openDetail(id) {
       activeDetailId = id;
-      const overlay = document.getElementById("detailOverlay");
-      overlay.classList.remove("hidden");
+      document.getElementById("detailOverlay").classList.remove("hidden");
       renderDetail();
     }
 
     function closeDetail() {
-      const overlay = document.getElementById("detailOverlay");
-      overlay.classList.add("hidden");
+      document.getElementById("detailOverlay").classList.add("hidden");
       activeDetailId = null;
-    }
-
-    function updateDetailIfActive(id) {
-      if (activeDetailId === id) {
-        renderDetail();
-      }
     }
 
     function renderDetail() {
@@ -674,8 +661,7 @@
 
       detailNameInput.addEventListener("change", () => {
         if (!activeDetailId) return;
-        const newName = detailNameInput.value.trim() || "Bez názvu";
-        updateCounterName(activeDetailId, newName);
+        updateCounterName(activeDetailId, detailNameInput.value);
       });
 
       renderCounters();
