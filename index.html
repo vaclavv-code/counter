@@ -6,18 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    /* Globálně zakáže označování/kopírování textu */
-    * {
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    /* V inputech necháme možnost psát a označovat text */
-    input, textarea {
-      -webkit-user-select: text;
-      user-select: text;
-    }
-
     :root {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #000;
@@ -33,24 +21,10 @@
       color: #f5f5f5;
     }
 
-    /* HORNÍ ČÁST – zadání názvu + přidání */
     .top-bar {
       display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.5rem;
       margin-bottom: 0.8rem;
-    }
-
-    .top-bar-main {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .top-bar-actions {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: flex-end;
     }
 
     .top-bar input {
@@ -78,6 +52,11 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
     }
 
     .btn-primary {
@@ -85,26 +64,16 @@
       color: #f9fafb;
     }
 
-    .icon-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 999px;
-      border: none;
-      background: #111827;
+    .btn-secondary {
+      background: #27272f;
+      color: #e5e7eb;
+    }
+
+    .btn-danger {
+      background: #ef4444;
       color: #f9fafb;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1.7rem;
     }
 
-    .icon-btn:active,
-    .btn:active {
-      transform: scale(0.95);
-    }
-
-    /* GRID COUNTERŮ */
     .counters {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -113,13 +82,14 @@
     }
 
     .counter-card {
+      background: #111827; /* přepsáno inline barvou counteru */
       border-radius: 1.1rem;
       box-shadow: 0 2px 12px rgba(0,0,0,0.45);
-      padding: 0.7rem;
+      padding: 0.7rem 0.7rem 0.75rem 0.7rem;
       display: flex;
       flex-direction: column;
       gap: 0.35rem;
-      color: #f9fafb;
+      border: 2px solid transparent;
       transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
     }
 
@@ -128,12 +98,21 @@
       box-shadow: 0 1px 6px rgba(0,0,0,0.6);
     }
 
+    .counter-header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
     .counter-name-label {
       font-weight: 800;
       font-size: 1.25rem;
+      padding: 0.1rem 0.1rem;
+      max-width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: #f9fafb;
     }
 
     .counter-value-wrapper {
@@ -142,6 +121,8 @@
       padding: 0.25rem 0.35rem 0.45rem 0.35rem;
       display: flex;
       flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
       flex: 1;
     }
 
@@ -149,7 +130,8 @@
       font-size: 2.8rem;
       font-weight: 800;
       text-align: center;
-      margin-bottom: 0.3rem;
+      margin: 0.02rem 0 0.2rem 0;
+      color: #f9fafb;
     }
 
     .counter-buttons-main {
@@ -163,7 +145,7 @@
     .counter-buttons-main .btn {
       border-radius: 0.9rem;
       padding-block: 1.1rem;
-      font-size: 2.4rem;
+      font-size: 2.4rem;   /* větší + / - */
       font-weight: 800;
       min-height: 80px;
     }
@@ -175,7 +157,8 @@
       color: #6b7280;
     }
 
-    /* FULLSCREEN DETAIL */
+    /* ---------- Fullscreen detail (dark) ---------- */
+
     .overlay {
       position: fixed;
       inset: 0;
@@ -194,9 +177,10 @@
       background: #020617;
       width: 100%;
       max-width: 900px;
-      height: 100%;
       display: flex;
       flex-direction: column;
+      height: 100%;
+      color: #f9fafb;
     }
 
     .detail-header {
@@ -205,6 +189,7 @@
       padding: 0.7rem 0.9rem;
       border-bottom: 1px solid #111827;
       gap: 0.6rem;
+      background: #020617;
     }
 
     .detail-back-btn {
@@ -213,39 +198,76 @@
       border-radius: 999px;
       border: none;
       background: #111827;
-      color: #e5e7eb;
-      font-size: 1.9rem;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
+      font-size: 1.9rem; /* větší ikonka */
       cursor: pointer;
       flex-shrink: 0;
+      color: #e5e7eb;
+    }
+
+    .detail-title-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
     }
 
     .detail-name {
-      flex: 1;
-      font-size: 1.5rem;
+      width: 100%;
+      border: none;
+      font-size: 1.4rem;
       font-weight: 800;
       background: #f9fafb;
-      color: #020617;
       padding: 0.35rem 0.55rem;
       border-radius: 0.7rem;
-      border: 1px solid #d4d4d4;
+      color: #020617;
+    }
+
+    .detail-name:focus {
+      outline: 2px solid #3b82f6;
+      background: #e5e7eb;
+    }
+
+    .detail-header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .icon-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: none;
+      background: #111827;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.9rem;  /* větší ikonky */
+      color: #e5e7eb;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
     }
 
     .detail-body {
       flex: 1;
-      padding: 0.5rem 0.9rem 0.9rem 0.9rem;
       display: flex;
       flex-direction: column;
+      padding: 0.5rem 0.9rem 0.9rem 0.9rem;
+      gap: 0.6rem;
+      background: #020617;
     }
 
     .detail-color-row {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
       gap: 0.35rem;
-      margin-bottom: 0.3rem;
+      justify-content: center;
+      margin-bottom: 0.2rem;
     }
 
     .detail-color-swatch {
@@ -254,7 +276,11 @@
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 0 0 2px #020617;
+      box-shadow: 0 0 0 2px #020617, 0 0 0 3px rgba(0,0,0,0.7);
+    }
+
+    .detail-color-swatch.selected {
+      box-shadow: 0 0 0 2px #020617, 0 0 0 3px #f9fafb;
     }
 
     .detail-value {
@@ -270,29 +296,22 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.6rem;
+      margin-top: auto;
     }
 
     .detail-buttons .btn {
       border-radius: 1.1rem;
       padding-block: 1.5rem;
-      font-size: 3rem;
+      font-size: 3rem;   /* větší + / - ve fullscreen */
       font-weight: 800;
       min-height: 96px;
     }
   </style>
 </head>
 <body>
-
-  <!-- HORNÍ ČÁST -->
   <div class="top-bar">
-    <div class="top-bar-main">
-      <input id="newCounterName" type="text" placeholder="Název počítadla">
-      <button class="btn btn-primary" id="addCounterBtn">+ Přidat</button>
-    </div>
-    <div class="top-bar-actions">
-      <button class="icon-btn" id="resetAllBtn" title="Resetovat všechny">↺</button>
-      <button class="icon-btn" id="deleteAllBtn" title="Smazat všechny">🗑</button>
-    </div>
+    <input id="newCounterName" type="text" placeholder="Název počítadla (např. Pull ups)">
+    <button class="btn btn-primary" id="addCounterBtn">+ Přidat</button>
   </div>
 
   <div id="counters" class="counters"></div>
@@ -301,12 +320,18 @@
     Hodnoty se ukládají jen do tohoto zařízení (localStorage).
   </div>
 
-  <!-- FULLSCREEN DETAIL -->
+  <!-- Fullscreen detail -->
   <div id="detailOverlay" class="overlay hidden">
     <div class="detail-view">
       <div class="detail-header">
         <button id="detailBackBtn" class="detail-back-btn">←</button>
-        <input id="detailName" class="detail-name">
+        <div class="detail-title-wrapper">
+          <input id="detailName" class="detail-name" />
+        </div>
+        <div class="detail-header-right">
+          <button id="detailResetBtn" class="icon-btn" title="Resetovat">↺</button>
+          <button id="detailDeleteBtn" class="icon-btn" title="Smazat">🗑</button>
+        </div>
       </div>
       <div class="detail-body">
         <div id="detailColorRow" class="detail-color-row"></div>
@@ -323,24 +348,31 @@
     const STORAGE_KEY = "my_counter_app_v3";
 
     const COLORS = [
-      "#f97316", "#6b7280", "#2563eb", "#ec4899", "#10b981",
-      "#7c3aed", "#22c55e", "#eab308", "#0ea5e9"
+      "#f97316", // oranžová
+      "#6b7280", // šedá
+      "#2563eb", // modrá
+      "#ec4899", // růžová
+      "#10b981", // zelená
+      "#7c3aed", // fialová
+      "#22c55e", // světle zelená
+      "#eab308", // žlutá
+      "#0ea5e9"  // světle modrá
     ];
 
-    let counters = loadCounters();
-    let activeDetailId = null;
+    // Zvuk "kliknutí" – krátký šum
     let audioContext = null;
-
     function playClickSound() {
       try {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
-        if (!audioContext) audioContext = new AC();
+        if (!audioContext) {
+          audioContext = new AC();
+        }
 
         const duration = 0.03;
-        const sr = audioContext.sampleRate;
-        const length = sr * duration;
-        const buffer = audioContext.createBuffer(1, length, sr);
+        const sampleRate = audioContext.sampleRate;
+        const length = sampleRate * duration;
+        const buffer = audioContext.createBuffer(1, length, sampleRate);
         const data = buffer.getChannelData(0);
 
         for (let i = 0; i < length; i++) {
@@ -349,14 +381,18 @@
         }
 
         const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+
         const gain = audioContext.createGain();
         gain.gain.value = 0.3;
 
-        source.buffer = buffer;
         source.connect(gain);
         gain.connect(audioContext.destination);
+
         source.start();
-      } catch (e) {}
+      } catch (e) {
+        console.warn("Audio error:", e);
+      }
     }
 
     function loadCounters() {
@@ -370,72 +406,154 @@
       }
     }
 
-    function saveCounters(cs) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cs));
-    }
-
-    function updateCounters(updater, options = { playSound: true }) {
-      counters = updater(counters);
-      saveCounters(counters);
-      renderCounters();
-      if (activeDetailId) renderDetail();
-      if (options.playSound) playClickSound();
+    function saveCounters(counters) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(counters));
     }
 
     function createId() {
-      return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,7);
+      return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7);
     }
 
-    function addCounter(name) {
-      const trimmed = name.trim();
-      updateCounters(cs => {
-        const idx = cs.length % COLORS.length;
-        return cs.concat({
-          id: createId(),
-          name: trimmed || `Počítadlo ${cs.length + 1}`,
-          value: 0,
-          color: COLORS[idx]
-        });
+    let counters = loadCounters();
+    let activeDetailId = null;
+
+    function renderCounters() {
+      const container = document.getElementById("counters");
+      container.innerHTML = "";
+
+      if (counters.length === 0) {
+        const empty = document.createElement("div");
+        empty.textContent = "Zatím žádné počítadlo. Přidej si první nahoře.";
+        empty.style.color = "#6b7280";
+        empty.style.fontSize = "0.9rem";
+        empty.style.gridColumn = "1 / -1";
+        container.appendChild(empty);
+        return;
+      }
+
+      counters.forEach(counter => {
+        const color = counter.color || COLORS[0];
+
+        const card = document.createElement("div");
+        card.className = "counter-card";
+        card.dataset.id = counter.id;
+        card.style.borderColor = color;
+        card.style.background = color; // dlaždice v barvě counteru
+
+        const header = document.createElement("div");
+        header.className = "counter-header";
+
+        const nameLabel = document.createElement("div");
+        nameLabel.className = "counter-name-label";
+        nameLabel.textContent = counter.name || "Bez názvu";
+
+        header.appendChild(nameLabel);
+
+        const valueWrapper = document.createElement("div");
+        valueWrapper.className = "counter-value-wrapper";
+
+        const valueEl = document.createElement("div");
+        valueEl.className = "counter-value";
+        valueEl.textContent = counter.value;
+
+        const mainButtons = document.createElement("div");
+        mainButtons.className = "counter-buttons-main";
+
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "btn btn-secondary";
+        minusBtn.textContent = "−";
+        minusBtn.addEventListener("click", () => changeValue(counter.id, -1));
+
+        const plusBtn = document.createElement("button");
+        plusBtn.className = "btn btn-primary";
+        plusBtn.textContent = "+";
+        plusBtn.style.background = "#020617";
+        plusBtn.style.color = "#f9fafb";
+        plusBtn.addEventListener("click", () => changeValue(counter.id, 1));
+
+        mainButtons.appendChild(minusBtn);
+        mainButtons.appendChild(plusBtn);
+
+        valueWrapper.appendChild(valueEl);
+        valueWrapper.appendChild(mainButtons);
+
+        card.appendChild(header);
+        card.appendChild(valueWrapper);
+        container.appendChild(card);
+
+        // Long press → otevřít detail, ale ne na tlačítkách
+        attachLongPress(card, () => openDetail(counter.id));
       });
-      document.getElementById("newCounterName").value = "";
     }
 
     function changeValue(id, delta) {
-      updateCounters(cs =>
-        cs.map(c => c.id === id ? { ...c, value: c.value + delta } : c)
+      counters = counters.map(c =>
+        c.id === id ? { ...c, value: c.value + delta } : c
       );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+      playClickSound();
     }
 
-    function updateCounterName(id, newName) {
-      const safe = newName.trim() || "Bez názvu";
-      updateCounters(
-        cs => cs.map(c => c.id === id ? { ...c, name: safe } : c),
-        { playSound: false }
+    function resetCounter(id) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, value: 0 } : c
       );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+      playClickSound();
     }
 
-    function setColor(id, color) {
-      updateCounters(cs =>
-        cs.map(c => c.id === id ? { ...c, color } : c)
-      );
-    }
-
-    function resetAllCounters() {
-      if (counters.length === 0) return;
-      if (confirm("Opravdu resetovat všechny hodnoty na 0?")) {
-        updateCounters(cs => cs.map(c => ({ ...c, value: 0 })));
-      }
-    }
-
-    function deleteAllCounters() {
-      if (counters.length === 0) return;
-      if (confirm("Opravdu smazat všechna počítadla?")) {
-        updateCounters(() => []);
+    function deleteCounter(id) {
+      counters = counters.filter(c => c.id !== id);
+      saveCounters(counters);
+      renderCounters();
+      if (activeDetailId === id) {
         closeDetail();
       }
     }
 
-    function attachLongPress(el, callback) {
+    function updateCounterName(id, newName) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, name: newName } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+    }
+
+    function setColor(id, color) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, color } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+      playClickSound();
+    }
+
+    function addCounter(name) {
+      const trimmed = name.trim();
+      const idx = counters.length % COLORS.length;
+      const color = COLORS[idx];
+
+      counters.push({
+        id: createId(),
+        name: trimmed || `Počítadlo ${counters.length + 1}`,
+        value: 0,
+        color
+      });
+      saveCounters(counters);
+      renderCounters();
+      playClickSound();
+      const input = document.getElementById("newCounterName");
+      input.value = "";
+    }
+
+    // ---------- Long press helper ----------
+    function attachLongPress(element, callback) {
       let timer = null;
 
       const start = (e) => {
@@ -453,26 +571,39 @@
         }
       };
 
-      el.addEventListener("pointerdown", start);
-      el.addEventListener("pointerup", cancel);
-      el.addEventListener("pointerleave", cancel);
-      el.addEventListener("pointercancel", cancel);
+      element.addEventListener("pointerdown", start);
+      element.addEventListener("pointerup", cancel);
+      element.addEventListener("pointerleave", cancel);
+      element.addEventListener("pointercancel", cancel);
     }
+
+    // ---------- Detail view ----------
 
     function openDetail(id) {
       activeDetailId = id;
-      document.getElementById("detailOverlay").classList.remove("hidden");
+      const overlay = document.getElementById("detailOverlay");
+      overlay.classList.remove("hidden");
       renderDetail();
     }
 
     function closeDetail() {
+      const overlay = document.getElementById("detailOverlay");
+      overlay.classList.add("hidden");
       activeDetailId = null;
-      document.getElementById("detailOverlay").classList.add("hidden");
+    }
+
+    function updateDetailIfActive(id) {
+      if (activeDetailId === id) {
+        renderDetail();
+      }
     }
 
     function renderDetail() {
-      const c = counters.find(x => x.id === activeDetailId);
-      if (!c) return;
+      if (!activeDetailId) return;
+      const counter = counters.find(c => c.id === activeDetailId);
+      if (!counter) return;
+
+      const color = counter.color || COLORS[0];
 
       const nameInput = document.getElementById("detailName");
       const valueEl = document.getElementById("detailValue");
@@ -480,108 +611,71 @@
       const plusBtn = document.getElementById("detailPlusBtn");
       const colorRow = document.getElementById("detailColorRow");
 
-      nameInput.value = c.name;
-      valueEl.textContent = c.value;
-      valueEl.style.color = c.color;
-      plusBtn.style.background = c.color;
+      nameInput.value = counter.name || "Bez názvu";
+      valueEl.textContent = counter.value;
+      valueEl.style.color = color;
+      plusBtn.style.background = color;
 
       colorRow.innerHTML = "";
-      COLORS.forEach(col => {
-        const b = document.createElement("button");
-        b.className = "detail-color-swatch";
-        b.style.background = col;
-        if (col === c.color) {
-          b.style.boxShadow = "0 0 0 3px #fff";
-        }
-        b.addEventListener("click", () => setColor(c.id, col));
-        colorRow.appendChild(b);
+      COLORS.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = "detail-color-swatch";
+        if (c === color) btn.classList.add("selected");
+        btn.style.background = c;
+        btn.addEventListener("click", () => setColor(counter.id, c));
+        colorRow.appendChild(btn);
       });
 
-      minusBtn.onclick = () => changeValue(c.id, -1);
-      plusBtn.onclick = () => changeValue(c.id, 1);
-    }
-
-    function renderCounters() {
-      const container = document.getElementById("counters");
-      container.innerHTML = "";
-
-      if (counters.length === 0) {
-        const empty = document.createElement("div");
-        empty.textContent = "Zatím žádné počítadlo.";
-        empty.style.color = "#6b7280";
-        empty.style.fontSize = "0.9rem";
-        empty.style.gridColumn = "1 / -1";
-        container.appendChild(empty);
-        return;
-      }
-
-      counters.forEach(c => {
-        const card = document.createElement("div");
-        card.className = "counter-card";
-        card.style.background = c.color;
-
-        const nameEl = document.createElement("div");
-        nameEl.className = "counter-name-label";
-        nameEl.textContent = c.name;
-
-        const wrap = document.createElement("div");
-        wrap.className = "counter-value-wrapper";
-
-        const val = document.createElement("div");
-        val.className = "counter-value";
-        val.textContent = c.value;
-
-        const btns = document.createElement("div");
-        btns.className = "counter-buttons-main";
-
-        const minusBtn = document.createElement("button");
-        minusBtn.className = "btn btn-secondary";
-        minusBtn.textContent = "−";
-        minusBtn.addEventListener("click", () => changeValue(c.id, -1));
-
-        const plusBtn = document.createElement("button");
-        plusBtn.className = "btn btn-primary";
-        plusBtn.textContent = "+";
-        plusBtn.style.background = "#020617";
-        plusBtn.style.color = "#f9fafb";
-        plusBtn.addEventListener("click", () => changeValue(c.id, 1));
-
-        btns.appendChild(minusBtn);
-        btns.appendChild(plusBtn);
-
-        wrap.appendChild(val);
-        wrap.appendChild(btns);
-
-        card.appendChild(nameEl);
-        card.appendChild(wrap);
-
-        attachLongPress(card, () => openDetail(c.id));
-
-        container.appendChild(card);
-      });
+      minusBtn.onclick = () => changeValue(counter.id, -1);
+      plusBtn.onclick = () => changeValue(counter.id, 1);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       const input = document.getElementById("newCounterName");
+      const btn = document.getElementById("addCounterBtn");
 
-      document.getElementById("addCounterBtn").addEventListener("click", () => {
+      btn.addEventListener("click", () => {
         addCounter(input.value);
       });
 
-      input.addEventListener("keypress", e => {
+      input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
-          addCounter(e.target.value);
+          addCounter(input.value);
           e.preventDefault();
         }
       });
 
-      document.getElementById("resetAllBtn").addEventListener("click", resetAllCounters);
-      document.getElementById("deleteAllBtn").addEventListener("click", deleteAllCounters);
+      const backBtn = document.getElementById("detailBackBtn");
+      const resetBtn = document.getElementById("detailResetBtn");
+      const deleteBtn = document.getElementById("detailDeleteBtn");
+      const detailNameInput = document.getElementById("detailName");
 
-      document.getElementById("detailBackBtn").addEventListener("click", closeDetail);
+      backBtn.addEventListener("click", () => {
+        closeDetail();
+      });
 
-      document.getElementById("detailName").addEventListener("change", e => {
-        if (activeDetailId) updateCounterName(activeDetailId, e.target.value);
+      resetBtn.addEventListener("click", () => {
+        if (!activeDetailId) return;
+        const c = counters.find(c => c.id === activeDetailId);
+        const name = c ? c.name : "počítadlo";
+        if (confirm(`Resetovat "${name}" na 0?`)) {
+          resetCounter(activeDetailId);
+        }
+      });
+
+      deleteBtn.addEventListener("click", () => {
+        if (!activeDetailId) return;
+        const c = counters.find(c => c.id === activeDetailId);
+        const name = c ? c.name : "počítadlo";
+        if (confirm(`Opravdu smazat "${name}"?`)) {
+          deleteCounter(activeDetailId);
+        }
+      });
+
+      detailNameInput.addEventListener("change", () => {
+        if (!activeDetailId) return;
+        const newName = detailNameInput.value.trim() || "Bez názvu";
+        updateCounterName(activeDetailId, newName);
       });
 
       renderCounters();
