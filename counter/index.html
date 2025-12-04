@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Soutok Counter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA: barva lišty a manifest -->
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- PWA: ikona pro iOS / některé launchery -->
+  <link rel="apple-touch-icon" href="icons/soutok-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
+      color: #f5f5f5;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      max-width: 900px;
+      margin-inline: auto;
+      background: #000;
+      color: #f5f5f5;
+    }
+
+    .top-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .top-bar input {
+      flex: 1;
+      padding: 0.5rem 0.7rem;
+      border-radius: 0.6rem;
+      border: 1px solid #d4d4d4;
+      background: #f9fafb;
+      font-size: 1rem;
+      font-weight: 650;
+      color: #020617;
+    }
+
+    .top-bar input::placeholder {
+      color: #6b7280;
+    }
+
+    .btn {
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: #f9fafb;
+    }
+
+    .btn-secondary {
+      background: #27272f;
+      color: #e5e7eb;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #f9fafb;
+    }
+
+    .counters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.9rem;
+      margin-top: 0.6rem;
+    }
+
+    .counter-card {
+      background: #111827; /* přepsáno inline barvou counteru */
+      border-radius: 1.1rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.45);
+      padding: 0.7rem 0.7rem 0.75rem 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      border: 2px solid transparent;
+      transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
+    }
+
+    .counter-card:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.6);
+    }
+
+    .counter-header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .counter-name-label {
+      font-weight: 800;
+      font-size: 1.25rem;
+      padding: 0.1rem 0.1rem;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #f9fafb;
+    }
+
+    .counter-value-wrapper {
+      background: rgba(0,0,0,0.25);
+      border-radius: 0.9rem;
+      padding: 0.25rem 0.35rem 0.45rem 0.35rem;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .counter-value {
+      font-size: 2.8rem;
+      font-weight: 800;
+      text-align: center;
+      margin: 0.02rem 0 0.2rem 0;
+      color: #f9fafb;
+    }
+
+    .counter-buttons-main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem;
+      width: 100%;
+      margin-top: auto;
+    }
+
+    .counter-buttons-main .btn {
+      border-radius: 0.9rem;
+      padding-block: 1.1rem;
+      font-size: 2.4rem;   /* větší + / - */
+      font-weight: 800;
+      min-height: 80px;
+    }
+
+    .footer {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    /* ---------- Fullscreen detail (dark) ---------- */
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .detail-view {
+      background: #020617;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      color: #f9fafb;
+    }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid #111827;
+      gap: 0.6rem;
+      background: #020617;
+    }
+
+    .detail-back-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: none;
+      background: #111827;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem; /* větší ikonka */
+      cursor: pointer;
+      flex-shrink: 0;
+      color: #e5e7eb;
+    }
+
+    .detail-title-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .detail-name {
+      width: 100%;
+      border: none;
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: #f9fafb;
+      padding: 0.35rem 0.55rem;
+      border-radius: 0.7rem;
+      color: #020617;
+    }
+
+    .detail-name:focus {
+      outline: 2px solid #3b82f6;
+      background: #e5e7eb;
+    }
+
+    .detail-header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .icon-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: none;
+      background: #111827;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.9rem;  /* větší ikonky */
+      color: #e5e7eb;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    .detail-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0.5rem 0.9rem 0.9rem 0.9rem;
+      gap: 0.6rem;
+      background: #020617;
+    }
+
+    .detail-color-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      justify-content: center;
+      margin-bottom: 0.2rem;
+    }
+
+    .detail-color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 0 2px #020617, 0 0 0 3px rgba(0,0,0,0.7);
+    }
+
+    .detail-color-swatch.selected {
+      box-shadow: 0 0 0 2px #020617, 0 0 0 3px #f9fafb;
+    }
+
+    .detail-value {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5.2rem;
+      font-weight: 800;
+    }
+
+    .detail-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: auto;
+    }
+
+    .detail-buttons .btn {
+      border-radius: 1.1rem;
+      padding-block: 1.5rem;
+      font-size: 3rem;   /* větší + / - ve fullscreen */
+      font-weight: 800;
+      min-height: 96px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <input id="newCounterName" type="text" placeholder="Název počítadla (např. Pull ups)">
+    <button class="btn btn-primary" id="addCounterBtn">+ Přidat</button>
+  </div>
+
+  <div id="counters" class="counters"></div>
+
+  <div class="footer">
+    Hodnoty se ukládají jen do tohoto zařízení (localStorage).
+  </div>
+
+  <!-- Fullscreen detail -->
+  <div id="detailOverlay" class="overlay hidden">
+    <div class="detail-view">
+      <div class="detail-header">
+        <button id="detailBackBtn" class="detail-back-btn">←</button>
+        <div class="detail-title-wrapper">
+          <input id="detailName" class="detail-name" />
+        </div>
+        <div class="detail-header-right">
+          <button id="detailResetBtn" class="icon-btn" title="Resetovat">↺</button>
+          <button id="detailDeleteBtn" class="icon-btn" title="Smazat">🗑</button>
+        </div>
+      </div>
+      <div class="detail-body">
+        <div id="detailColorRow" class="detail-color-row"></div>
+        <div id="detailValue" class="detail-value">0</div>
+        <div class="detail-buttons">
+          <button id="detailMinusBtn" class="btn btn-secondary">−</button>
+          <button id="detailPlusBtn" class="btn btn-primary">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "my_counter_app_v3";
+
+    const COLORS = [
+      "#f97316", // oranžová
+      "#FF0000", // červená
+      "#2563eb", // modrá
+      "#ec4899", // růžová
+      "#10b981", // zelená
+      "#7c3aed", // fialová
+      "#22c55e", // světle zelená
+      "#eab308", // žlutá
+      "#0ea5e9"  // světle modrá
+    ];
+
+    // Zvuk "kliknutí" – krátký šum
+    let audioContext = null;
+    function playClickSound() {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!audioContext) {
+          audioContext = new AC();
+        }
+
+        const duration = 0.03;
+        const sampleRate = audioContext.sampleRate;
+        const length = sampleRate * duration;
+        const buffer = audioContext.createBuffer(1, length, sampleRate);
+        const data = buffer.getChannelData(0);
+
+        for (let i = 0; i < length; i++) {
+          const envelope = 1 - i / length;
+          data[i] = (Math.random() * 2 - 1) * envelope * 0.4;
+        }
+
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+
+        const gain = audioContext.createGain();
+        gain.gain.value = 0.3;
+
+        source.connect(gain);
+        gain.connect(audioContext.destination);
+
+        source.start();
+      } catch (e) {
+        console.warn("Audio error:", e);
+      }
+    }
+
+    function loadCounters() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      try {
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCounters(counters) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(counters));
+    }
+
+    function createId() {
+      return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7);
+    }
+
+    let counters = loadCounters();
+    let activeDetailId = null;
+
+    function renderCounters() {
+      const container = document.getElementById("counters");
+      container.innerHTML = "";
+
+      if (counters.length === 0) {
+        const empty = document.createElement("div");
+        empty.textContent = "Zatím žádné počítadlo. Přidej si první nahoře.";
+        empty.style.color = "#6b7280";
+        empty.style.fontSize = "0.9rem";
+        empty.style.gridColumn = "1 / -1";
+        container.appendChild(empty);
+        return;
+      }
+
+      counters.forEach(counter => {
+        const color = counter.color || COLORS[0];
+
+        const card = document.createElement("div");
+        card.className = "counter-card";
+        card.dataset.id = counter.id;
+        card.style.borderColor = color;
+        card.style.background = color; // dlaždice v barvě counteru
+
+        const header = document.createElement("div");
+        header.className = "counter-header";
+
+        const nameLabel = document.createElement("div");
+        nameLabel.className = "counter-name-label";
+        nameLabel.textContent = counter.name || "Bez názvu";
+
+        header.appendChild(nameLabel);
+
+        const valueWrapper = document.createElement("div");
+        valueWrapper.className = "counter-value-wrapper";
+
+        const valueEl = document.createElement("div");
+        valueEl.className = "counter-value";
+        valueEl.textContent = counter.value;
+
+        const mainButtons = document.createElement("div");
+        mainButtons.className = "counter-buttons-main";
+
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "btn btn-secondary";
+        minusBtn.textContent = "−";
+        minusBtn.addEventListener("click", () => changeValue(counter.id, -1));
+
+        const plusBtn = document.createElement("button");
+        plusBtn.className = "btn btn-primary";
+        plusBtn.textContent = "+";
+        plusBtn.style.background = "#020617";
+        plusBtn.style.color = "#f9fafb";
+        plusBtn.addEventListener("click", () => changeValue(counter.id, 1));
+
+        mainButtons.appendChild(minusBtn);
+        mainButtons.appendChild(plusBtn);
+
+        valueWrapper.appendChild(valueEl);
+        valueWrapper.appendChild(mainButtons);
+
+        card.appendChild(header);
+        card.appendChild(valueWrapper);
+        container.appendChild(card);
+
+        // Long press → otevřít detail, ale ne na tlačítkách
+        attachLongPress(card, () => openDetail(counter.id));
+      });
+    }
+
+    function changeValue(id, delta) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, value: c.value + delta } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+      playClickSound();
+    }
+
+    function resetCounter(id) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, value: 0 } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+      playClickSound();
+    }
+
+    function deleteCounter(id) {
+      counters = counters.filter(c => c.id !== id);
+      saveCounters(counters);
+      renderCounters();
+      if (activeDetailId === id) {
+        closeDetail();
+      }
+    }
+
+    function updateCounterName(id, newName) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, name: newName } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+    }
+
+    function setColor(id, color) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, color } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+      updateDetailIfActive(id);
+      playClickSound();
+    }
+
+    function addCounter(name) {
+      const trimmed = name.trim();
+      const idx = counters.length % COLORS.length;
+      const color = COLORS[idx];
+
+      counters.push({
+        id: createId(),
+        name: trimmed || `Počítadlo ${counters.length + 1}`,
+        value: 0,
+        color
+      });
+      saveCounters(counters);
+      renderCounters();
+      playClickSound();
+      const input = document.getElementById("newCounterName");
+      input.value = "";
+    }
+
+    // ---------- Long press helper ----------
+    function attachLongPress(element, callback) {
+      let timer = null;
+
+      const start = (e) => {
+        if (e.target.closest("button")) return;
+        timer = setTimeout(() => {
+          timer = null;
+          callback();
+        }, 500);
+      };
+
+      const cancel = () => {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      };
+
+      element.addEventListener("pointerdown", start);
+      element.addEventListener("pointerup", cancel);
+      element.addEventListener("pointerleave", cancel);
+      element.addEventListener("pointercancel", cancel);
+    }
+
+    // ---------- Detail view ----------
+
+    function openDetail(id) {
+      activeDetailId = id;
+      const overlay = document.getElementById("detailOverlay");
+      overlay.classList.remove("hidden");
+      renderDetail();
+    }
+
+    function closeDetail() {
+      const overlay = document.getElementById("detailOverlay");
+      overlay.classList.add("hidden");
+      activeDetailId = null;
+    }
+
+    function updateDetailIfActive(id) {
+      if (activeDetailId === id) {
+        renderDetail();
+      }
+    }
+
+    function renderDetail() {
+      if (!activeDetailId) return;
+      const counter = counters.find(c => c.id === activeDetailId);
+      if (!counter) return;
+
+      const color = counter.color || COLORS[0];
+
+      const nameInput = document.getElementById("detailName");
+      const valueEl = document.getElementById("detailValue");
+      const minusBtn = document.getElementById("detailMinusBtn");
+      const plusBtn = document.getElementById("detailPlusBtn");
+      const colorRow = document.getElementById("detailColorRow");
+
+      nameInput.value = counter.name || "Bez názvu";
+      valueEl.textContent = counter.value;
+      valueEl.style.color = color;
+      plusBtn.style.background = color;
+
+      colorRow.innerHTML = "";
+      COLORS.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = "detail-color-swatch";
+        if (c === color) btn.classList.add("selected");
+        btn.style.background = c;
+        btn.addEventListener("click", () => setColor(counter.id, c));
+        colorRow.appendChild(btn);
+      });
+
+      minusBtn.onclick = () => changeValue(counter.id, -1);
+      plusBtn.onclick = () => changeValue(counter.id, 1);
+    }
+
+    // PWA: registrace service workeru
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js").catch(() => {});
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("newCounterName");
+      const btn = document.getElementById("addCounterBtn");
+
+      btn.addEventListener("click", () => {
+        addCounter(input.value);
+      });
+
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          addCounter(input.value);
+          e.preventDefault();
+        }
+      });
+
+      const backBtn = document.getElementById("detailBackBtn");
+      const resetBtn = document.getElementById("detailResetBtn");
+      const deleteBtn = document.getElementById("detailDeleteBtn");
+      const detailNameInput = document.getElementById("detailName");
+
+      backBtn.addEventListener("click", () => {
+        closeDetail();
+      });
+
+      resetBtn.addEventListener("click", () => {
+        if (!activeDetailId) return;
+        const c = counters.find(c => c.id === activeDetailId);
+        const name = c ? c.name : "počítadlo";
+        if (confirm(`Resetovat "${name}" na 0?`)) {
+          resetCounter(activeDetailId);
+        }
+      });
+
+      deleteBtn.addEventListener("click", () => {
+        if (!activeDetailId) return;
+        const c = counters.find(c => c.id === activeDetailId);
+        const name = c ? c.name : "počítadlo";
+        if (confirm(`Opravdu smazat "${name}"?`)) {
+          deleteCounter(activeDetailId);
+        }
+      });
+
+      detailNameInput.addEventListener("change", () => {
+        if (!activeDetailId) return;
+        const newName = detailNameInput.value.trim() || "Bez názvu";
+        updateCounterName(activeDetailId, newName);
+      });
+
+      renderCounters();
+    });
+  </script>
+</body>
+</html>
