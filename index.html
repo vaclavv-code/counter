@@ -6,6 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
+    /* Globálně zakáže označování/kopírování textu */
+    * {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* V inputech necháme možnost psát a označovat text */
+    input, textarea {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
     :root {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #000;
@@ -21,12 +33,24 @@
       color: #f5f5f5;
     }
 
-    /* HORNÍ LIŠTA */
+    /* HORNÍ ČÁST – zadání názvu + přidání */
     .top-bar {
       display: flex;
-      gap: 0.5rem;
+      flex-direction: column;
+      gap: 0.4rem;
       margin-bottom: 0.8rem;
+    }
+
+    .top-bar-main {
+      display: flex;
+      gap: 0.5rem;
       align-items: center;
+    }
+
+    .top-bar-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
     }
 
     .top-bar input {
@@ -54,7 +78,6 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      user-select: none;
     }
 
     .btn-primary {
@@ -73,14 +96,15 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.6rem;
+      font-size: 1.7rem;
     }
 
-    .icon-btn:active {
+    .icon-btn:active,
+    .btn:active {
       transform: scale(0.95);
     }
 
-    /* GRID */
+    /* GRID COUNTERŮ */
     .counters {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -95,8 +119,8 @@
       display: flex;
       flex-direction: column;
       gap: 0.35rem;
-      transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
       color: #f9fafb;
+      transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
     }
 
     .counter-card:active {
@@ -144,7 +168,14 @@
       min-height: 80px;
     }
 
-    /* FULLSCREEN */
+    .footer {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    /* FULLSCREEN DETAIL */
     .overlay {
       position: fixed;
       inset: 0;
@@ -199,7 +230,7 @@
       color: #020617;
       padding: 0.35rem 0.55rem;
       border-radius: 0.7rem;
-      border: none;
+      border: 1px solid #d4d4d4;
     }
 
     .detail-body {
@@ -252,12 +283,16 @@
 </head>
 <body>
 
-  <!-- HORNÍ LIŠTA -->
+  <!-- HORNÍ ČÁST -->
   <div class="top-bar">
-    <input id="newCounterName" type="text" placeholder="Název počítadla">
-    <button class="btn btn-primary" id="addCounterBtn">+ Přidat</button>
-    <button class="icon-btn" id="resetAllBtn" title="Resetovat všechny">↺</button>
-    <button class="icon-btn" id="deleteAllBtn" title="Smazat všechny">🗑</button>
+    <div class="top-bar-main">
+      <input id="newCounterName" type="text" placeholder="Název počítadla">
+      <button class="btn btn-primary" id="addCounterBtn">+ Přidat</button>
+    </div>
+    <div class="top-bar-actions">
+      <button class="icon-btn" id="resetAllBtn" title="Resetovat všechny">↺</button>
+      <button class="icon-btn" id="deleteAllBtn" title="Smazat všechny">🗑</button>
+    </div>
   </div>
 
   <div id="counters" class="counters"></div>
@@ -269,22 +304,18 @@
   <!-- FULLSCREEN DETAIL -->
   <div id="detailOverlay" class="overlay hidden">
     <div class="detail-view">
-
       <div class="detail-header">
         <button id="detailBackBtn" class="detail-back-btn">←</button>
         <input id="detailName" class="detail-name">
       </div>
-
       <div class="detail-body">
         <div id="detailColorRow" class="detail-color-row"></div>
         <div id="detailValue" class="detail-value">0</div>
-
         <div class="detail-buttons">
           <button id="detailMinusBtn" class="btn btn-secondary">−</button>
           <button id="detailPlusBtn" class="btn btn-primary">+</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -300,7 +331,6 @@
     let activeDetailId = null;
     let audioContext = null;
 
-    /* ---------- SOUND ---------- */
     function playClickSound() {
       try {
         const AC = window.AudioContext || window.webkitAudioContext;
@@ -308,9 +338,9 @@
         if (!audioContext) audioContext = new AC();
 
         const duration = 0.03;
-        const sampleRate = audioContext.sampleRate;
-        const length = sampleRate * duration;
-        const buffer = audioContext.createBuffer(1, length, sampleRate);
+        const sr = audioContext.sampleRate;
+        const length = sr * duration;
+        const buffer = audioContext.createBuffer(1, length, sr);
         const data = buffer.getChannelData(0);
 
         for (let i = 0; i < length; i++) {
@@ -329,7 +359,6 @@
       } catch (e) {}
     }
 
-    /* ---------- STORAGE ---------- */
     function loadCounters() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return [];
@@ -345,7 +374,6 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cs));
     }
 
-    /* ---------- STATE UPDATE WRAPPER ---------- */
     function updateCounters(updater, options = { playSound: true }) {
       counters = updater(counters);
       saveCounters(counters);
@@ -358,7 +386,6 @@
       return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,7);
     }
 
-    /* ---------- COUNTER OPERATIONS ---------- */
     function addCounter(name) {
       const trimmed = name.trim();
       updateCounters(cs => {
@@ -408,7 +435,6 @@
       }
     }
 
-    /* ---------- LONG PRESS ---------- */
     function attachLongPress(el, callback) {
       let timer = null;
 
@@ -433,7 +459,6 @@
       el.addEventListener("pointercancel", cancel);
     }
 
-    /* ---------- FULLSCREEN ---------- */
     function openDetail(id) {
       activeDetailId = id;
       document.getElementById("detailOverlay").classList.remove("hidden");
@@ -476,7 +501,6 @@
       plusBtn.onclick = () => changeValue(c.id, 1);
     }
 
-    /* ---------- RENDER GRID ---------- */
     function renderCounters() {
       const container = document.getElementById("counters");
       container.innerHTML = "";
@@ -537,13 +561,14 @@
       });
     }
 
-    /* ---------- DOM INIT ---------- */
     document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("addCounterBtn").addEventListener("click", () =>
-        addCounter(document.getElementById("newCounterName").value)
-      );
+      const input = document.getElementById("newCounterName");
 
-      document.getElementById("newCounterName").addEventListener("keypress", e => {
+      document.getElementById("addCounterBtn").addEventListener("click", () => {
+        addCounter(input.value);
+      });
+
+      input.addEventListener("keypress", e => {
         if (e.key === "Enter") {
           addCounter(e.target.value);
           e.preventDefault();
