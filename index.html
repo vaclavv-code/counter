@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Můj Counter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Základní jednoduchý styl -->
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111;
+      color: #f5f5f5;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      max-width: 600px;
+      margin-inline: auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .top-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .top-bar input {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #444;
+      background: #1b1b1b;
+      color: #f5f5f5;
+    }
+
+    .btn {
+      padding: 0.5rem 0.8rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      background: #3a86ff;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      background: #444;
+    }
+
+    .btn-danger {
+      background: #e63946;
+    }
+
+    .counters {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .counter-card {
+      background: #1b1b1b;
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .counter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .counter-name {
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      background: transparent;
+      color: #f5f5f5;
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.3rem;
+    }
+
+    .counter-name:focus {
+      outline: 1px solid #3a86ff;
+      background: #222;
+    }
+
+    .counter-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0.2rem 0 0.5rem 0;
+    }
+
+    .counter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .counter-buttons .btn {
+      flex: 1;
+    }
+
+    .footer {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>Můj Counter</h1>
+
+  <div class="top-bar">
+    <input id="newCounterName" type="text" placeholder="Název počítadla (např. Kliky)">
+    <button class="btn" id="addCounterBtn">+ Přidat</button>
+  </div>
+
+  <div id="counters" class="counters"></div>
+
+  <div class="footer">
+    Hodnoty se ukládají jen do tohoto zařízení (localStorage).
+  </div>
+
+  <script>
+    // Klíč v localStorage
+    const STORAGE_KEY = "my_counter_app_v1";
+
+    /** Načte uložené počítadla z localStorage */
+    function loadCounters() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      try {
+        const data = JSON.parse(raw);
+        if (Array.isArray(data)) return data;
+      } catch (e) {
+        console.error("Chyba při parsování dat:", e);
+      }
+      return [];
+    }
+
+    /** Uloží počítadla do localStorage */
+    function saveCounters(counters) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(counters));
+    }
+
+    /** Vytvoří unikátní ID */
+    function createId() {
+      return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7);
+    }
+
+    let counters = loadCounters();
+
+    /** Přerenderuje celý seznam počítadel */
+    function renderCounters() {
+      const container = document.getElementById("counters");
+      container.innerHTML = "";
+
+      if (counters.length === 0) {
+        const empty = document.createElement("div");
+        empty.textContent = "Zatím žádné počítadlo. Přidej si první nahoře.";
+        empty.style.color = "#888";
+        empty.style.fontSize = "0.9rem";
+        container.appendChild(empty);
+        return;
+      }
+
+      counters.forEach(counter => {
+        const card = document.createElement("div");
+        card.className = "counter-card";
+        card.dataset.id = counter.id;
+
+        // Hlavička – název + tlačítko smazat
+        const header = document.createElement("div");
+        header.className = "counter-header";
+
+        const nameInput = document.createElement("input");
+        nameInput.className = "counter-name";
+        nameInput.value = counter.name || "Bez názvu";
+        nameInput.addEventListener("change", () => {
+          updateCounterName(counter.id, nameInput.value.trim() || "Bez názvu");
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn btn-danger";
+        deleteBtn.textContent = "Smazat";
+        deleteBtn.addEventListener("click", () => {
+          if (confirm(`Opravdu smazat počítadlo "${counter.name}"?`)) {
+            deleteCounter(counter.id);
+          }
+        });
+
+        header.appendChild(nameInput);
+        header.appendChild(deleteBtn);
+
+        // Hodnota
+        const valueEl = document.createElement("div");
+        valueEl.className = "counter-value";
+        valueEl.textContent = counter.value;
+
+        // Tlačítka
+        const buttons = document.createElement("div");
+        buttons.className = "counter-buttons";
+
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "btn btn-secondary";
+        minusBtn.textContent = "−1";
+        minusBtn.addEventListener("click", () => changeValue(counter.id, -1));
+
+        const plusBtn = document.createElement("button");
+        plusBtn.className = "btn";
+        plusBtn.textContent = "+1";
+        plusBtn.addEventListener("click", () => changeValue(counter.id, 1));
+
+        const resetBtn = document.createElement("button");
+        resetBtn.className = "btn btn-secondary";
+        resetBtn.textContent = "Reset";
+        resetBtn.addEventListener("click", () => resetCounter(counter.id));
+
+        buttons.appendChild(minusBtn);
+        buttons.appendChild(plusBtn);
+        buttons.appendChild(resetBtn);
+
+        card.appendChild(header);
+        card.appendChild(valueEl);
+        card.appendChild(buttons);
+
+        container.appendChild(card);
+      });
+    }
+
+    /** Změní hodnotu počítadla */
+    function changeValue(id, delta) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, value: c.value + delta } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+    }
+
+    /** Resetuje počítadlo na 0 */
+    function resetCounter(id) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, value: 0 } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+    }
+
+    /** Smaže počítadlo */
+    function deleteCounter(id) {
+      counters = counters.filter(c => c.id !== id);
+      saveCounters(counters);
+      renderCounters();
+    }
+
+    /** Změní název počítadla */
+    function updateCounterName(id, newName) {
+      counters = counters.map(c =>
+        c.id === id ? { ...c, name: newName } : c
+      );
+      saveCounters(counters);
+      renderCounters();
+    }
+
+    /** Přidá nové počítadlo */
+    function addCounter(name) {
+      const trimmed = name.trim();
+      const finalName = trimmed || `Počítadlo ${counters.length + 1}`;
+      counters.push({
+        id: createId(),
+        name: finalName,
+        value: 0
+      });
+      saveCounters(counters);
+      renderCounters();
+    }
+
+    // Inicializace
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("newCounterName");
+      const btn = document.getElementById("addCounterBtn");
+
+      btn.addEventListener("click", () => {
+        addCounter(input.value);
+        input.value = "";
+        input.focus();
+      });
+
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          addCounter(input.value);
+          input.value = "";
+        }
+      });
+
+      renderCounters();
+    });
+  </script>
+</body>
+</html>
