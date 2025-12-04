@@ -84,19 +84,12 @@
       background: #fff;
       border-radius: 1.1rem;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding: 0.8rem 0.8rem 0.9rem 0.8rem;
+      padding: 0.7rem 0.7rem 0.75rem 0.7rem;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.35rem;
       border: 2px solid transparent;
       transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
-    }
-
-    /* Na mobilech zhruba 3 řady na výšku */
-    @media (max-width: 700px) {
-      .counter-card {
-        min-height: 30vh;
-      }
     }
 
     .counter-card:active {
@@ -106,14 +99,13 @@
 
     .counter-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
-      gap: 0.4rem;
     }
 
     .counter-name {
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: 650;
+      font-size: 1.05rem;
       border: none;
       background: transparent;
       padding: 0.1rem 0.3rem;
@@ -126,45 +118,28 @@
       background: #f3f4ff;
     }
 
-    .color-btn {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      flex-shrink: 0;
-      box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgba(0,0,0,0.08);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
     .counter-value-wrapper {
       background: #f9fafb;
       border-radius: 0.9rem;
-      padding: 0.4rem 0.4rem 0.7rem 0.4rem;
+      padding: 0.3rem 0.35rem 0.5rem 0.35rem;
       display: flex;
       flex-direction: column;
       align-items: stretch;
       justify-content: center;
-      margin-top: 0.15rem;
       flex: 1;
     }
 
     .counter-value {
-      font-size: 2.2rem;
+      font-size: 2.6rem;
       font-weight: 700;
       text-align: center;
-      margin: 0.1rem 0 0.35rem 0;
+      margin: 0.05rem 0 0.25rem 0;
     }
 
     .counter-buttons-main {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.35rem;
+      gap: 0.3rem;
       width: 100%;
       margin-top: auto;
     }
@@ -211,21 +186,21 @@
     .detail-header {
       display: flex;
       align-items: center;
-      padding: 0.6rem 0.8rem;
+      padding: 0.7rem 0.9rem;
       border-bottom: 1px solid #e5e7eb;
-      gap: 0.4rem;
+      gap: 0.5rem;
     }
 
     .detail-back-btn {
-      width: 34px;
-      height: 34px;
+      width: 42px;
+      height: 42px;
       border-radius: 999px;
       border: none;
       background: #f3f4f6;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       cursor: pointer;
       flex-shrink: 0;
     }
@@ -239,10 +214,10 @@
     .detail-name {
       width: 100%;
       border: none;
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 1.1rem;
+      font-weight: 650;
       background: transparent;
-      padding: 0.2rem 0.3rem;
+      padding: 0.25rem 0.35rem;
       border-radius: 0.4rem;
     }
 
@@ -254,12 +229,12 @@
     .detail-header-right {
       display: flex;
       align-items: center;
-      gap: 0.2rem;
+      gap: 0.25rem;
     }
 
     .icon-btn {
-      width: 34px;
-      height: 34px;
+      width: 42px;
+      height: 42px;
       border-radius: 999px;
       border: none;
       background: #f3f4f6;
@@ -267,7 +242,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
     }
 
     .icon-btn:active {
@@ -278,20 +253,20 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 0.8rem;
-      gap: 0.8rem;
+      padding: 0.9rem;
+      gap: 0.9rem;
     }
 
     .detail-color-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
+      gap: 0.45rem;
       justify-content: center;
     }
 
     .detail-color-swatch {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
@@ -307,19 +282,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 4rem;
+      font-size: 4.8rem;
       font-weight: 700;
     }
 
     .detail-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
+      gap: 0.6rem;
       margin-top: auto;
     }
 
     .detail-buttons .btn {
-      border-radius: 1rem;
+      border-radius: 1.1rem;
       padding-block: 1.5rem;
       font-size: 2.4rem;
       min-height: 96px;
@@ -330,7 +305,7 @@
   <h1>All counters</h1>
 
   <div class="top-bar">
-    <input id="newCounterName" type="text" placeholder="Název počítadla (např. Pull ups)">
+    <input id="newCounterName" type="text" placeholder="Název">
     <button class="btn btn-primary" id="addCounterBtn">+ Přidat</button>
   </div>
 
@@ -469,21 +444,7 @@
           updateCounterName(counter.id, nameInput.value.trim() || "Bez názvu");
         });
 
-        const headerRight = document.createElement("div");
-        headerRight.className = "header-right";
-
-        const colorBtn = document.createElement("button");
-        colorBtn.className = "color-btn";
-        colorBtn.style.background = color;
-        colorBtn.title = "Změnit barvu";
-        colorBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          cycleColor(counter.id);
-        });
-
-        headerRight.appendChild(colorBtn);
         header.appendChild(nameInput);
-        header.appendChild(headerRight);
 
         const valueWrapper = document.createElement("div");
         valueWrapper.className = "counter-value-wrapper";
@@ -558,21 +519,6 @@
       saveCounters(counters);
       renderCounters();
       updateDetailIfActive(id);
-    }
-
-    function cycleColor(id) {
-      counters = counters.map(c => {
-        if (c.id !== id) return c;
-        const current = c.color || COLORS[0];
-        let idx = COLORS.indexOf(current);
-        if (idx === -1) idx = 0;
-        const next = COLORS[(idx + 1) % COLORS.length];
-        return { ...c, color: next };
-      });
-      saveCounters(counters);
-      renderCounters();
-      updateDetailIfActive(id);
-      playClickSound();
     }
 
     function setColor(id, color) {
@@ -662,7 +608,6 @@
       const colorRow = document.getElementById("detailColorRow");
 
       nameInput.value = counter.name || "Bez názvu";
-      nameInput.style.color = "#111";
       valueEl.textContent = counter.value;
       valueEl.style.color = color;
       plusBtn.style.background = color;
@@ -678,7 +623,6 @@
         colorRow.appendChild(btn);
       });
 
-      // Připojení handlerů (jednou)
       minusBtn.onclick = () => changeValue(counter.id, -1);
       plusBtn.onclick = () => changeValue(counter.id, 1);
     }
